@@ -10,8 +10,7 @@ pub struct User {
     pub created_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[derive(sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
 pub struct Portfolio {
     pub id: Uuid,
     pub user_id: Uuid,
@@ -21,8 +20,7 @@ pub struct Portfolio {
     pub updated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[derive(sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
 pub struct Order {
     pub id: Uuid,
     pub user_id: Uuid,
@@ -32,6 +30,8 @@ pub struct Order {
     pub price: sqlx::types::BigDecimal,
     pub quantity: sqlx::types::BigDecimal,
     pub status: String,
+    pub queue_ahead: sqlx::types::BigDecimal,
+    pub executed_quantity: sqlx::types::BigDecimal,
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
 }

@@ -1,18 +1,15 @@
 use crate::AppState;
 use axum::{
     extract::{
-        ws::{Message, WebSocket, WebSocketUpgrade},
         State,
+        ws::{Message, WebSocket, WebSocketUpgrade},
     },
     response::IntoResponse,
 };
 use std::time::Duration;
 use tokio::time::interval;
 
-pub async fn ws_handler(
-    ws: WebSocketUpgrade,
-    State(state): State<AppState>,
-) -> impl IntoResponse {
+pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> impl IntoResponse {
     ws.on_upgrade(|socket| handle_socket(socket, state))
 }
 
@@ -32,7 +29,7 @@ async fn handle_socket(mut socket: WebSocket, state: AppState) {
                         "type": "prices",
                         "data": prices
                     });
-                    
+
                     if socket.send(Message::Text(payload.to_string().into())).await.is_err() {
                         // client disconnected
                         return;

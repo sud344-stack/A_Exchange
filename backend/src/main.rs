@@ -1,17 +1,17 @@
 mod db;
-mod models;
-mod routes;
 mod engine;
 mod market;
+mod models;
+mod routes;
 
 use axum::{
-    routing::{get, post},
     Router,
+    routing::{get, post},
 };
+use market::binance::MarketData;
 use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use market::binance::MarketData;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -35,7 +35,7 @@ async fn main() {
 
     // Initialize Database
     let pool = db::init_db().await;
-    
+
     // Initialize Market Data
     let market_data = MarketData::new();
     market_data.start_binance_websocket().await;
@@ -57,11 +57,15 @@ async fn main() {
         .allow_headers(Any);
 
     // Setup router
-    let app = Router::new().fallback_service( tower_http::services::ServeDir::new("../frontend/dist"))
+    let app = Router::new()
+        .fallback_service(tower_http::services::ServeDir::new("../frontend/dist"))
         .route("/health", get(|| async { "OK" }))
         .route("/ws", get(routes::ws::ws_handler))
         .route("/api/users", post(routes::api::create_user))
-        .route("/api/users/{user_id}/portfolio", get(routes::api::get_portfolio))
+        .route(
+            "/api/users/{user_id}/portfolio",
+            get(routes::api::get_portfolio),
+        )
         .route("/api/orders", post(routes::api::create_order))
         .layer(cors)
         .with_state(state);
